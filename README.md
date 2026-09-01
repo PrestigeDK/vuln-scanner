@@ -7,7 +7,7 @@ Udviklet i Python som et praktisk værktøj til at identificere eksponerede serv
 - **Hurtig asynkron portscanning:** Bruger Pythons `asyncio` til at scanne porte uden at blokere systemet.
 - **Banner Grabbing:** Identificerer præcise service- og softwareversioner på åbne porte.
 - **Automatisk CVE-opslag:** Integrerer med sårbarhedsdatabaser (NVD API) for at finde kendte sårbarheder for de fundne versioner.
-- **Brugervenligt CLI:** Flot terminal-output med farvekodede tabeller via `Rich`.
+- **Brugervenligt CLI:** Terminal-output med farvekodede tabeller via `Rich`.
 
 ## Stak
 - **Sprog:** Python 3.11+
@@ -17,10 +17,10 @@ Udviklet i Python som et praktisk værktøj til at identificere eksponerede serv
 - **Terminal UI:** Rich
 
 ## Installation
-Klon projektet og opsæt dit virtuelle miljø:
+Klon projektet og opsæt det virtuelle miljø:
 
 ```bash
-git clone <dit-repo-url>
+git clone <https://github.com/PrestigeDK/Custom-Vulnerability-Scanner.git>
 cd vuln-scanner
 python3 -m venv venv
 source venv/bin/activate
