@@ -1,0 +1,13 @@
+# CLI og Terminal Output
+typer>=0.9.0
+rich>=13.0.0
+
+# Netværk og Datahåndtering
+httpx>=0.25.0
+pydantic>=2.0.0
+
+# Udvikling og Test (Dev dependencies)
+pytest
+pytest-asyncio
+ruff
+mypy
