@@ -5,7 +5,9 @@ from typing import Any
 async def scan_port(
     host: str, port: int, timeout: float = 1.0
 ) -> dict[str, Any] | None:
-    """Checks if a specific port is open and attempts to retrieve a banner."""
+    """
+    Checks if a specific port is open and attempts to retrieve a banner.
+    """
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(host, port), timeout=timeout
@@ -35,7 +37,9 @@ async def scan_ports(
     concurrency: int = 100,
     timeout: float = 1.0,
 ) -> list[dict[str, Any]]:
-    """Scans a list of ports asynchronously with limited concurrency (Semaphore)."""
+    """
+    Scans a list of ports asynchronously with limited concurrency (Semaphore).
+    """
     semaphore = asyncio.Semaphore(concurrency)
 
     async def worker(port: int) -> dict[str, Any] | None:
