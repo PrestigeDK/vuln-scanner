@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from typing import Any
 
 from rich.console import Console
@@ -8,9 +10,7 @@ console = Console()
 
 
 def get_severity_color(severity: str, score: float) -> str:
-    """
-    Returns a Rich color tag based on vulnerability severity or CVSS score.
-    """
+    """Returns a Rich color tag based on vulnerability severity or CVSS score."""
     sev_upper = severity.upper()
     if sev_upper == "CRITICAL" or score >= 9.0:
         return "bold red"
@@ -24,9 +24,7 @@ def get_severity_color(severity: str, score: float) -> str:
 
 
 def print_scan_results(target: str, results: list[dict[str, Any]]) -> None:
-    """
-    Renders scan results and associated CVEs in formatted Rich tables.
-    """
+    """Renders scan results and associated CVEs in formatted Rich tables."""
     console.print()
     console.print(
         Panel.fit(
@@ -57,7 +55,7 @@ def print_scan_results(target: str, results: list[dict[str, Any]]) -> None:
         cve_summary_lines = []
 
         if cves:
-            for cve in cves[:3]:  # Limit to top 3 CVEs per port for display
+            for cve in cves:
                 cve_id = cve.get("cve_id", "N/A")
                 severity = cve.get("severity", "UNKNOWN")
                 score = cve.get("score", 0.0)
@@ -73,34 +71,90 @@ def print_scan_results(target: str, results: list[dict[str, Any]]) -> None:
     console.print()
 
 
-if __name__ == "__main__":
-    # Mock data for local visual testing of the UI component
-    mock_results = [
-        {
-            "port": 22,
-            "banner": "SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13",
-            "product": "OpenSSH",
-            "version": "6.6.1",
-            "cves": [
-                {
-                    "cve_id": "CVE-2016-10009",
-                    "severity": "HIGH",
-                    "score": 7.5,
-                },
-                {
-                    "cve_id": "CVE-2015-5600",
-                    "severity": "MEDIUM",
-                    "score": 5.3,
-                },
-            ],
-        },
-        {
-            "port": 80,
-            "banner": "No banner received",
-            "product": None,
-            "version": None,
-            "cves": [],
-        },
-    ]
+def export_results(target: str, results: list[dict[str, Any]], filepath: Path) -> None:
+    """Exports scan data to a JSON or HTML file based on the file extension."""
+    suffix = filepath.suffix.lower()
 
-    print_scan_results("scanme.nmap.org", mock_results)
+    if suffix == ".json":
+        data = {"target": target, "results": results}
+        filepath.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        console.print(f"[bold green][+][/] Scan report saved to [bold]{filepath}[/]")
+
+    elif suffix == ".html":
+        html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan Report - {target}</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f4f4f9;
+            color: #333;
+        }}
+        h1 {{ color: #2c3e50; }}
+        table {{
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            background: white;
+        }}
+        th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
+        th {{ background-color: #34495e; color: white; }}
+        .badge {{
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+        }}
+        .HIGH, .CRITICAL {{ background-color: #e74c3c; }}
+        .MEDIUM {{ background-color: #f39c12; }}
+        .LOW {{ background-color: #3498db; }}
+        .UNKNOWN {{ background-color: #7f8c8d; }}
+    </style>
+</head>
+<body>
+    <h1>VulnScanner Report for {target}</h1>
+    <table>
+        <tr>
+            <th>Port</th>
+            <th>Banner</th>
+            <th>Service</th>
+            <th>Vulnerabilities</th>
+        </tr>
+"""
+        for item in results:
+            cve_html = ""
+            for cve in item.get("cves", []):
+                sev = cve.get("severity", "UNKNOWN")
+                description = cve.get("description", "")
+                cve_html += (
+                    "<div><strong>"
+                    f"{cve['cve_id']}"
+                    "</strong> <span class='badge "
+                    f"{sev}'>{sev} {cve['score']}</span> - "
+                    f"{description[:100]}...</div><br>"
+                )
+
+            if not cve_html:
+                cve_html = "<em>No CVEs match criteria</em>"
+
+            html_content += f"""
+        <tr>
+            <td>{item["port"]}</td>
+            <td>{item["banner"][:50]}</td>
+            <td>{item.get("product", "Unknown")} {item.get("version", "")}</td>
+            <td>{cve_html}</td>
+        </tr>
+"""
+        html_content += """
+    </table>
+</body>
+</html>
+"""
+        filepath.write_text(html_content, encoding="utf-8")
+        console.print(f"[bold green][+][/] HTML report saved to [bold]{filepath}[/]")
+    else:
+        console.print(
+            f"[bold red][!][/] Unsupported file format: {suffix}. Use .json or .html"
+        )

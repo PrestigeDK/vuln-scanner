@@ -1,4 +1,4 @@
-import asyncio
+import os
 import re
 from typing import Any
 
@@ -23,12 +23,19 @@ def parse_banner(banner: str) -> tuple[str | None, str | None]:
 
 
 async def fetch_cves_for_query(
-    query: str, max_results: int = 5, timeout: float = 10.0
+    query: str,
+    max_results: int = 5,
+    timeout: float = 10.0,
+    api_key: str | None = None,
 ) -> list[dict[str, Any]]:
-    """
-    Fetches known CVEs from the NIST NVD API based on a search keyword.
-    """
+    """Fetches known CVEs from the NIST NVD API based on a search keyword."""
     headers = {"User-Agent": "VulnScanner-CLI/1.0"}
+
+    # Use explicitly passed key or fallback to environment variable
+    resolved_key = api_key or os.getenv("NVD_API_KEY")
+    if resolved_key:
+        headers["apiKey"] = resolved_key
+
     params = {"keywordSearch": query, "resultsPerPage": max_results}
 
     try:
@@ -44,14 +51,12 @@ async def fetch_cves_for_query(
             cve_data = item.get("cve", {})
             cve_id = cve_data.get("id", "N/A")
 
-            # Extract English description
             descriptions = cve_data.get("descriptions", [])
             description = next(
                 (d["value"] for d in descriptions if d.get("lang") == "en"),
                 "No description available.",
             )
 
-            # Extract CVSS v3.1 rating if available
             metrics = cve_data.get("metrics", {})
             cvss_data = None
             if metrics.get("cvssMetricV31"):
@@ -79,29 +84,3 @@ async def fetch_cves_for_query(
     except httpx.RequestError as err:
         print(f"Network error occurred while fetching CVEs: {err}")
         return []
-
-
-if __name__ == "__main__":
-    raw_banner = "SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13"
-    print(f"Raw banner: '{raw_banner}'")
-
-    product, version = parse_banner(raw_banner)
-    print(f"Parsed product: '{product}', version: '{version}'")
-
-    if product:
-        # We query by product name (e.g. OpenSSH) to match NVD descriptions
-        print(f"Querying NVD API for product: '{product}'...")
-        results = asyncio.run(fetch_cves_for_query(product, max_results=5))
-
-        if results:
-            print(f"\nFound {len(results)} CVEs for {product}:")
-            for cve in results:
-                print(
-                    f"- [{cve['cve_id']}] Severity: {cve['severity']}"
-                    f" (Score: {cve['score']})"
-                )
-                print(f"  Summary: {cve['description'][:120]}...\n")
-        else:
-            print("No CVEs found.")
-    else:
-        print("Could not parse product/version from banner.")
