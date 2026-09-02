@@ -1,6 +1,6 @@
 # VulnScanner CLI
 
-[![CI Pipeline](https://github.com/<PrestigeDK>/vuln-scanner/actions/workflows/ci.yml/badge.svg?branch=prod)](https://github.com/<PrestigeDK>/vuln-scanner/actions)
+[![CI Pipeline](https://github.com/PrestigeDK/vuln-scanner/actions/workflows/ci.yml/badge.svg?branch=prod)](https://github.com/PrestigeDK/vuln-scanner/actions)
 ![Python Version](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Docker Supported](https://img.shields.io/badge/docker-supported-green)
 
@@ -37,7 +37,7 @@ graph TD
 Clone the repository and set up a virtual environment:
 
 ```bash
-git clone https://github.com/<YOUR_GITHUB_USERNAME>/vuln-scanner.git
+git clone https://github.com/<PrestigeDK>/vuln-scanner.git
 cd vuln-scanner
 python3 -m venv venv
 source venv/bin/activate
