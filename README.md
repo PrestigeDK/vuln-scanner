@@ -49,7 +49,7 @@ pip install -r requirements.txt
 ## Usage Examples
 
 ### 1. Basic Scan
-Scan a target using default ports (`21, 22, 80, 443, 8080, 8443`):
+Scan a target using default ports (`21, 22, 23, 25, 53,  80, 110, 143, 389, 443, 445, 3000, 3306,  3389, 5000, 5432, 6379, 8000, 8080, 8443, 27017`):
 
 ```bash
 python -m src.cli scanme.nmap.org
