@@ -37,7 +37,7 @@ graph TD
 Clone the repository and set up a virtual environment:
 
 ```bash
-git clone https://github.com/<PrestigeDK>/vuln-scanner.git
+git clone https://github.com/PrestigeDK/vuln-scanner.git
 cd vuln-scanner
 python3 -m venv venv
 source venv/bin/activate
