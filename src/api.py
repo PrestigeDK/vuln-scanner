@@ -54,7 +54,7 @@ async def fetch_cves_for_query(
             # Extract CVSS v3.1 rating if available
             metrics = cve_data.get("metrics", {})
             cvss_data = None
-            if "cvssMetricV31" in metrics and metrics["cvssMetricV31"]:
+            if metrics.get("cvssMetricV31"):
                 cvss_data = metrics["cvssMetricV31"][0].get("cvssData", {})
 
             severity = (
