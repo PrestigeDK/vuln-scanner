@@ -134,6 +134,13 @@ def scan(
         )
 
     # Render terminal UI
+    closed_count = len(port_list) - len(enriched_results)
+    console.print(
+        f"[bold green][+][/] Found [bold]{len(enriched_results)}[/] open ports "
+        f"([dim]{closed_count} closed/filtered[/])\n"
+    )
+
+    # Render terminal UI
     print_scan_results(target, enriched_results)
 
     # Export report if requested
