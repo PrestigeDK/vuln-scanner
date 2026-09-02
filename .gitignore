@@ -1,0 +1,27 @@
+# Python & Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Testing & Linting Caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# Generated Scan Reports (Output from local runs)
+report.html
+report.json
+
+# Environment variables & Secrets
+.env
+
+# OS & Editor files
+.DS_Store
+.vscode/
+.idea/
