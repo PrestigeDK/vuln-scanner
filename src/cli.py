@@ -16,7 +16,29 @@ app = typer.Typer(
 )
 console = Console()
 
-DEFAULT_PORTS = [21, 22, 80, 443, 8080, 8443]
+DEFAULT_PORTS = [
+    21,  # FTP
+    22,  # SSH
+    23,  # Telnet
+    25,  # SMTP
+    53,  # DNS
+    80,  # HTTP
+    110,  # POP3
+    143,  # IMAP
+    389,  # LDAP
+    443,  # HTTPS
+    445,  # SMB
+    3000,  # Node / React Dev Apps
+    3306,  # MySQL / MariaDB
+    3389,  # RDP (Remote Desktop)
+    5000,  # Flask / Python Apps
+    5432,  # PostgreSQL
+    6379,  # Redis
+    8000,  # Django / Alt-Web
+    8080,  # HTTP Proxy / Web
+    8443,  # HTTPS Alt
+    27017,  # MongoDB
+]
 
 
 @app.command()
