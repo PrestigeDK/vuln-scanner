@@ -86,7 +86,9 @@ def scan(
         ),
     ] = None,
 ) -> None:
-    """Scans a target for open ports and queries known CVEs for identified services."""
+    """
+    Scans a target for open ports and queries known CVEs for identified services.
+    """
     if ports:
         try:
             port_list = [int(p.strip()) for p in ports.split(",")]
@@ -102,7 +104,6 @@ def scan(
         f"\n[bold blue][*][/] Initiating scan against "
         f"[bold]{target}[/] on {len(port_list)} ports..."
     )
-
     raw_scan_data = asyncio.run(scan_ports(target, port_list))
 
     if not raw_scan_data:
@@ -113,14 +114,20 @@ def scan(
     for item in raw_scan_data:
         banner = item["banner"]
         product, version = parse_banner(banner)
-
         cves = []
         if product:
-            console.print(f"[bold blue][*][/] Fetching CVEs for [cyan]{product}[/]...")
-            raw_cves = asyncio.run(
-                fetch_cves_for_query(product, max_results=max_cves, api_key=api_key)
+            service_label = f"{product} {version}" if version else product
+            console.print(
+                f"[bold blue][*][/] Fetching CVEs for [cyan]{service_label}[/]..."
             )
-            # Filter CVEs based on minimum CVSS score
+            raw_cves = asyncio.run(
+                fetch_cves_for_query(
+                    query=product,
+                    version=version,
+                    max_results=max_cves,
+                    api_key=api_key,
+                )
+            )
             cves = [c for c in raw_cves if c.get("score", 0.0) >= min_score]
 
         enriched_results.append(
@@ -133,17 +140,14 @@ def scan(
             }
         )
 
-    # Render terminal UI
     closed_count = len(port_list) - len(enriched_results)
     console.print(
         f"[bold green][+][/] Found [bold]{len(enriched_results)}[/] open ports "
         f"([dim]{closed_count} closed/filtered[/])\n"
     )
 
-    # Render terminal UI
     print_scan_results(target, enriched_results)
 
-    # Export report if requested
     if output:
         export_results(target, enriched_results, output)
 
