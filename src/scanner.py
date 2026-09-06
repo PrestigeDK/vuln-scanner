@@ -18,7 +18,7 @@ async def scan_port(
             # Wait briefly for the service to send a banner (e.g., SSH, FTP, SMTP)
             data = await asyncio.wait_for(reader.read(1024), timeout=1.0)
             banner = data.decode("utf-8", errors="ignore").strip()
-        except (asyncio.TimeoutError, OSError):
+        except (TimeoutError, OSError):
             banner = "No banner received"
         finally:
             writer.close()
@@ -26,7 +26,7 @@ async def scan_port(
 
         return {"port": port, "status": "open", "banner": banner}
 
-    except (asyncio.TimeoutError, OSError):
+    except (TimeoutError, OSError):
         # Port is closed or filtered
         return None
 

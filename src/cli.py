@@ -22,7 +22,6 @@ def main() -> None:
     """
     VulnScanner - Async Port & Vulnerability Scanner for CLI
     """
-    pass
 
 
 DEFAULT_PORTS = [
