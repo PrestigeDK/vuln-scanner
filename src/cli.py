@@ -16,14 +16,6 @@ app = typer.Typer(
 )
 console = Console()
 
-
-@app.callback()
-def main() -> None:
-    """
-    VulnScanner - Async Port & Vulnerability Scanner for CLI
-    """
-
-
 DEFAULT_PORTS = [
     21,  # FTP
     22,  # SSH
@@ -47,6 +39,14 @@ DEFAULT_PORTS = [
     8443,  # HTTPS Alt
     27017,  # MongoDB
 ]
+
+
+@app.callback()
+def main() -> None:
+    """
+    VulnScanner - Async Port & Vulnerability Scanner for CLI
+    """
+    pass
 
 
 @app.command()
@@ -119,9 +119,15 @@ def scan(
         raise typer.Exit()
 
     enriched_results = []
+    os_guesses = []
+
     for item in raw_scan_data:
         banner = item["banner"]
         product, version = parse_banner(banner)
+        os_guess = item.get("os_guess", "Unknown")
+        if os_guess != "Unknown":
+            os_guesses.append(os_guess)
+
         cves = []
         if product:
             service_label = f"{product} {version}" if version else product
@@ -144,6 +150,8 @@ def scan(
                 "banner": banner,
                 "product": product,
                 "version": version,
+                "os_guess": os_guess,
+                "ttl": item.get("ttl"),
                 "cves": cves,
             }
         )
@@ -154,10 +162,11 @@ def scan(
         f"([dim]{closed_count} closed/filtered[/])\n"
     )
 
-    print_scan_results(target, enriched_results)
+    detected_os = os_guesses[0] if os_guesses else "Unknown"
+    print_scan_results(target, enriched_results, os_guess=detected_os)
 
     if output:
-        export_results(target, enriched_results, output)
+        export_results(target, enriched_results, output, os_guess=detected_os)
 
 
 if __name__ == "__main__":

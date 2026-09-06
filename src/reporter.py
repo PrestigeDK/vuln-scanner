@@ -10,7 +10,9 @@ console = Console()
 
 
 def get_severity_color(severity: str, score: float) -> str:
-    """Returns a Rich color tag based on vulnerability severity or CVSS score."""
+    """
+    Returns a Rich color tag based on vulnerability severity or CVSS score.
+    """
     sev_upper = severity.upper()
     if sev_upper == "CRITICAL" or score >= 9.0:
         return "bold red"
@@ -23,12 +25,17 @@ def get_severity_color(severity: str, score: float) -> str:
     return "dim"
 
 
-def print_scan_results(target: str, results: list[dict[str, Any]]) -> None:
-    """Renders scan results and associated CVEs in formatted Rich tables."""
+def print_scan_results(
+    target: str, results: list[dict[str, Any]], os_guess: str = "Unknown"
+) -> None:
+    """
+    Renders scan results, estimated OS, and associated CVEs in Rich tables.
+    """
     console.print()
     console.print(
         Panel.fit(
-            f"[bold cyan]Target:[/] [green]{target}[/]",
+            f"[bold cyan]Target:[/] [green]{target}[/]\n"
+            f"[bold cyan]Estimated OS (TTL):[/] [bold yellow]{os_guess}[/]",
             title="[bold yellow]VulnScanner CLI[/]",
             border_style="bright_blue",
         )
@@ -40,8 +47,8 @@ def print_scan_results(target: str, results: list[dict[str, Any]]) -> None:
 
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("Port", style="cyan", justify="right")
-    table.add_column("Banner", style="white")
-    table.add_column("Parsed Product", style="green")
+    table.add_column("Banner / Header", style="white")
+    table.add_column("Parsed Service", style="green")
     table.add_column("Top CVEs", style="white")
 
     for item in results:
@@ -53,14 +60,13 @@ def print_scan_results(target: str, results: list[dict[str, Any]]) -> None:
 
         cves = item.get("cves", [])
         cve_summary_lines = []
-
         if cves:
             for cve in cves:
                 cve_id = cve.get("cve_id", "N/A")
                 severity = cve.get("severity", "UNKNOWN")
                 score = cve.get("score", 0.0)
                 color = get_severity_color(severity, score)
-                cve_summary_lines.append(f"• [{color}]{cve_id}[/] ({severity} {score})")
+                cve_summary_lines.append(f"  [{color}]{cve_id}[/] ({severity} {score})")
         else:
             cve_summary_lines.append("[dim]No CVEs found[/]")
 
@@ -71,15 +77,20 @@ def print_scan_results(target: str, results: list[dict[str, Any]]) -> None:
     console.print()
 
 
-def export_results(target: str, results: list[dict[str, Any]], filepath: Path) -> None:
-    """Exports scan data to a JSON or HTML file based on the file extension."""
+def export_results(
+    target: str,
+    results: list[dict[str, Any]],
+    filepath: Path,
+    os_guess: str = "Unknown",
+) -> None:
+    """
+    Exports scan data including OS estimation and banners to a JSON or HTML file.
+    """
     suffix = filepath.suffix.lower()
-
     if suffix == ".json":
-        data = {"target": target, "results": results}
+        data = {"target": target, "os_guess": os_guess, "results": results}
         filepath.write_text(json.dumps(data, indent=2), encoding="utf-8")
         console.print(f"[bold green][+][/] Scan report saved to [bold]{filepath}[/]")
-
     elif suffix == ".html":
         html_content = f"""<!DOCTYPE html>
 <html>
@@ -92,7 +103,8 @@ def export_results(target: str, results: list[dict[str, Any]], filepath: Path) -
             background-color: #f4f4f9;
             color: #333;
         }}
-        h1 {{ color: #2c3e50; }}
+        h1 {{ color: #2c3e50; margin-bottom: 5px; }}
+        .subtitle {{ color: #7f8c8d; font-size: 1.1em; margin-bottom: 20px; }}
         table {{
             border-collapse: collapse;
             width: 100%;
@@ -111,15 +123,22 @@ def export_results(target: str, results: list[dict[str, Any]], filepath: Path) -
         .MEDIUM {{ background-color: #f39c12; }}
         .LOW {{ background-color: #3498db; }}
         .UNKNOWN {{ background-color: #7f8c8d; }}
+        code {{
+            background-color: #eef1f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }}
     </style>
 </head>
 <body>
     <h1>VulnScanner Report for {target}</h1>
+    <div class="subtitle"><strong>Estimated OS (TTL):</strong> {os_guess}</div>
     <table>
         <tr>
             <th>Port</th>
-            <th>Banner</th>
-            <th>Service</th>
+            <th>Banner / Header</th>
+            <th>Parsed Service</th>
             <th>Vulnerabilities</th>
         </tr>
 """
@@ -135,23 +154,22 @@ def export_results(target: str, results: list[dict[str, Any]], filepath: Path) -
                     f"{sev}'>{sev} {cve['score']}</span> - "
                     f"{description[:100]}...</div><br>"
                 )
-
             if not cve_html:
                 cve_html = "<em>No CVEs match criteria</em>"
 
+            banner_text = item.get("banner", "")[:80] or "No banner received"
             html_content += f"""
         <tr>
             <td>{item["port"]}</td>
-            <td>{item["banner"][:50]}</td>
+            <td><code>{banner_text}</code></td>
             <td>{item.get("product", "Unknown")} {item.get("version", "")}</td>
             <td>{cve_html}</td>
-        </tr>
-"""
+        </tr>"""
+
         html_content += """
     </table>
 </body>
-</html>
-"""
+</html>"""
         filepath.write_text(html_content, encoding="utf-8")
         console.print(f"[bold green][+][/] HTML report saved to [bold]{filepath}[/]")
     else:

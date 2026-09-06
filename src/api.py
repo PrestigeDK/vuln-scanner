@@ -11,7 +11,7 @@ def parse_banner(banner: str) -> tuple[str | None, str | None]:
     """
     Extracts product name and version as separate strings from a raw service banner.
     """
-    pattern = r"([a-zA-Z]+)[/\_]([0-9]+\.[0-9]+(?:\.[0-9]+)?)"
+    pattern = r"([a-zA-Z][a-zA-Z0-9\-_]*)[/\_]([0-9]+\.[0-9]+(?:\.[0-9]+)?)"
     match = re.search(pattern, banner)
     if match:
         product = match.group(1)

@@ -9,7 +9,8 @@
             background-color: #f4f4f9;
             color: #333;
         }
-        h1 { color: #2c3e50; }
+        h1 { color: #2c3e50; margin-bottom: 5px; }
+        .subtitle { color: #7f8c8d; font-size: 1.1em; margin-bottom: 20px; }
         table {
             border-collapse: collapse;
             width: 100%;
@@ -28,46 +29,49 @@
         .MEDIUM { background-color: #f39c12; }
         .LOW { background-color: #3498db; }
         .UNKNOWN { background-color: #7f8c8d; }
+        code {
+            background-color: #eef1f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
     <h1>VulnScanner Report for daedalussystems.dk</h1>
+    <div class="subtitle"><strong>Estimated OS (TTL):</strong> Linux / Unix / macOS</div>
     <table>
         <tr>
             <th>Port</th>
-            <th>Banner</th>
-            <th>Service</th>
+            <th>Banner / Header</th>
+            <th>Parsed Service</th>
             <th>Vulnerabilities</th>
         </tr>
 
         <tr>
             <td>80</td>
-            <td>No banner received</td>
+            <td><code>cloudflare</code></td>
             <td>None None</td>
             <td><em>No CVEs match criteria</em></td>
         </tr>
-
         <tr>
             <td>443</td>
-            <td>No banner received</td>
+            <td><code>cloudflare</code></td>
             <td>None None</td>
             <td><em>No CVEs match criteria</em></td>
         </tr>
-
         <tr>
             <td>8080</td>
-            <td>No banner received</td>
+            <td><code>cloudflare</code></td>
             <td>None None</td>
             <td><em>No CVEs match criteria</em></td>
         </tr>
-
         <tr>
             <td>8443</td>
-            <td>No banner received</td>
+            <td><code>cloudflare</code></td>
             <td>None None</td>
             <td><em>No CVEs match criteria</em></td>
         </tr>
-
     </table>
 </body>
 </html>
