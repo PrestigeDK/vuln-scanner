@@ -17,3 +17,6 @@ dependencies = [
 
 [project.scripts]
 vulnscanner = "src.cli:app"
+
+[tool.setuptools]
+packages = ["src"]
