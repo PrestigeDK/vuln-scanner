@@ -16,6 +16,15 @@ app = typer.Typer(
 )
 console = Console()
 
+
+@app.callback()
+def main() -> None:
+    """
+    VulnScanner - Async Port & Vulnerability Scanner for CLI
+    """
+    pass
+
+
 DEFAULT_PORTS = [
     21,  # FTP
     22,  # SSH

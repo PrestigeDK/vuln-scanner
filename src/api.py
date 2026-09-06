@@ -86,10 +86,7 @@ def is_version_vulnerable(cve_data: dict[str, Any], target_version: str | None) 
         if is_vulnerable:
             break
 
-    if matched_any_node and not is_vulnerable:
-        return False
-
-    return True
+    return not (matched_any_node and not is_vulnerable)
 
 
 async def fetch_cves_for_query(

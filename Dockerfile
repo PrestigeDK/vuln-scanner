@@ -8,12 +8,18 @@ ENV FORCE_COLOR=1
 
 WORKDIR /app
 
-# Copy and install dependencies
-COPY requirements.txt .
+# Copy dependencies and project setup
+COPY requirements.txt pyproject.toml ./
+
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy source code
+# Copy source code and README
 COPY src/ ./src/
+COPY README.md ./
 
-# Set CLI entrypoint
-ENTRYPOINT ["python", "-m", "src.cli"]
+# Install the package locally to expose the "vulnscanner" command
+RUN pip install --no-cache-dir -e .
+
+# Set CLI entrypoint to the newly created command
+ENTRYPOINT ["vulnscanner"]

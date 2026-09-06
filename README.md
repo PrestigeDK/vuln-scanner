@@ -15,7 +15,7 @@ graph TD
     A[User / CLI Input] --> B[src/cli.py]
     B --> C[src/scanner.py - Async Port Scanner]
     C --> D[Banner Grabbing]
-    D --> E[src/api.py - Regex Parsing & NVD Query]
+    D --> E[src/api.py - Regex Parsing & Smart CVE Filtering]
     E --> F[src/reporter.py - Rich Terminal Output]
 ```
 
@@ -28,7 +28,6 @@ graph TD
 - **Automated CVE Lookup:** Integration with the official NIST National Vulnerability Database (NVD) API v2.
 - **Terminal UI:** Color-coded severity ratings and structured tables powered by `Rich`.
 - **Fully Containerized:** Pre-configured Docker environment ready for instant execution anywhere.
-- **Automated Quality Control:** Full test coverage with `pytest` and automated CI/CD via GitHub Actions.
 
 ---
 
@@ -37,11 +36,14 @@ graph TD
 Clone the repository and set up a virtual environment:
 
 ```bash
-git clone https://github.com/PrestigeDK/vuln-scanner.git
+git clone [https://github.com/PrestigeDK/vuln-scanner.git](https://github.com/PrestigeDK/vuln-scanner.git)
 cd vuln-scanner
 python3 -m venv venv
 source venv/bin/activate
+
+# Install requirements and register the CLI command
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ---
@@ -52,14 +54,14 @@ pip install -r requirements.txt
 Scan a target using default ports (`21, 22, 23, 25, 53,  80, 110, 143, 389, 443, 445, 3000, 3306,  3389, 5000, 5432, 6379, 8000, 8080, 8443, 27017`):
 
 ```bash
-python -m src.cli scanme.nmap.org
+vulnscanner scan scanme.nmap.org
 ```
 
 ### 2. Custom Ports & CVE Limit
 Specify target ports and limit the maximum number of retrieved CVEs per service:
 
 ```bash
-python -m src.cli scanme.nmap.org --ports 22,80,443 --max-cves 5
+vulnscanner scan scanme.nmap.org --ports 22,80,443 --max-cves 5 --min-score 5.0
 ```
 
 ### 3. Run with Docker / Podman
@@ -70,7 +72,7 @@ Run the scanner inside an isolated container without setting up local Python dep
 docker build -t vulnscanner .
 
 # Execute a scan
-docker run --rm vulnscanner scanme.nmap.org --ports 22,80,443
+docker run --rm vulnscanner scan scanme.nmap.org --ports 22,80,443
 ```
 
 ---
